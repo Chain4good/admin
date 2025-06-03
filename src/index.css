@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: "Inter", system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Inter", system-ui, sans-serif;
+    font-weight: 600;
+  }
+}
+
+/* Custom Ant Design styles */
+.ant-layout {
+  font-family: "Inter", system-ui, sans-serif !important;
+}
+
+.ant-menu {
+  font-family: "Inter", system-ui, sans-serif !important;
+}
+
+.ant-menu-item {
+  border-radius: 0.375rem !important;
+  margin: 4px 8px !important;
+}
+
+.ant-menu-item:hover {
+  background-color: #334155 !important;
+}
+
+.ant-menu-item.ant-menu-item-selected {
+  background-color: #2563eb !important;
+}
+
+.ant-table {
+  font-family: "Inter", system-ui, sans-serif !important;
+}
+
+.ant-table-thead > tr > th {
+  background-color: #f8fafc !important;
+}
+
+.ant-btn {
+  border-radius: 0.375rem !important;
+}
+/* Login page styles */
+.ant-input-affix-wrapper {
+  border-radius: 0.375rem !important;
+}
+
+.ant-input-affix-wrapper:not(.ant-input-affix-wrapper-disabled):hover {
+  border-color: #2563eb !important;
+}
+
+.ant-input-affix-wrapper-focused,
+.ant-input-affix-wrapper:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+}
+/* Add to your existing styles */
+.ant-upload.ant-upload-select {
+  width: 100% !important;
+  height: 200px !important;
+  margin-bottom: 0 !important;
+}
+
+.ant-modal-content {
+  padding: 24px !important;
+  border-radius: 0.5rem !important;
+}
+
+/* Add to your existing styles */
+.ant-select-selector {
+  border-radius: 0.375rem !important;
+}
+
+.ant-select:not(.ant-select-disabled):not(.ant-select-customize-input):not(
+    .ant-pagination-size-changer
+  ):hover
+  .ant-select-selector {
+  border-color: #2563eb !important;
+}
+
+.ant-select-focused:not(.ant-select-disabled).ant-select:not(
+    .ant-select-customize-input
+  )
+  .ant-select-selector {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+}
