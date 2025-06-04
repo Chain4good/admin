@@ -110,3 +110,11 @@ export const sendEmailToOwner = async (id, email) => {
   });
   return await requestInstance.post(url, { email });
 };
+
+export const analyzeCampaignTrust = async (id) => {
+  const url = queryString.stringifyUrl({
+    url: `/ai/analyze-campaign-trust/${id}`,
+  });
+  const { data } = await requestInstance.get(url);
+  return data;
+};

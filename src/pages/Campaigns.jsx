@@ -1,4 +1,5 @@
 import ManageWrapper from "@/components/ManageWrapper";
+import CampaignAnalysis from "@/components/CampaignAnalysis";
 import { CampaignStatus, CampaignStatusColor } from "@/constants/status";
 import { useCampaign } from "@/hooks/useCampaign";
 import {
@@ -7,13 +8,18 @@ import {
   sendEmailToOwner,
   summarizeByAI,
   updateCampaignStatus,
+  analyzeCampaignTrust,
 } from "@/services/campaignService";
 import { MoreOutlined } from "@ant-design/icons";
 import { Button, Dropdown, message, Modal, Table, Tag } from "antd";
 import { truncate } from "lodash";
+import { useState } from "react";
 
 const Campaigns = () => {
   const { data: campaigns, isFetching, refetch } = useCampaign();
+  const [analysisVisible, setAnalysisVisible] = useState(false);
+  const [analysisData, setAnalysisData] = useState(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
 
   const handleStatusChange = async (id, newStatus) => {
     try {
@@ -84,6 +90,19 @@ const Campaigns = () => {
     }
   };
 
+  const handleAnalyze = async (id) => {
+    try {
+      setAnalysisVisible(true);
+      setAnalysisLoading(true);
+      const data = await analyzeCampaignTrust(id);
+      setAnalysisData(data);
+    } catch (error) {
+      message.error("Không thể phân tích chiến dịch!");
+    } finally {
+      setAnalysisLoading(false);
+    }
+  };
+
   const getStatusItems = (record) => [
     {
       key: "PENDING",
@@ -135,6 +154,11 @@ const Campaigns = () => {
       key: "email",
       label: "Gửi email",
       onClick: () => handleSendEmail(record.id, record.user.email),
+    },
+    {
+      key: "analyze",
+      label: "Phân tích độ tin cậy",
+      onClick: () => handleAnalyze(record.id),
     },
     {
       key: "delete",
@@ -261,6 +285,16 @@ const Campaigns = () => {
           current: campaigns?.current_page,
           showSizeChanger: true,
           showQuickJumper: true,
+        }}
+      />
+
+      <CampaignAnalysis
+        visible={analysisVisible}
+        loading={analysisLoading}
+        data={analysisData}
+        onClose={() => {
+          setAnalysisVisible(false);
+          setAnalysisData(null);
         }}
       />
     </ManageWrapper>

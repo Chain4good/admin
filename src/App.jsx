@@ -10,6 +10,9 @@ import Auth from "./layouts/Auth";
 import Countries from "./pages/Countries";
 import FundraiseTypes from "./pages/FundraiseTypes";
 import Campaigns from "./pages/Campaigns";
+import Notifications from "./pages/Notifications";
+import Topics from "./pages/Topics";
+import Posts from "./pages/Posts";
 
 function App() {
   const isAuthenticated = useUserStore((state) => state.isAuthenticated);
@@ -37,6 +40,9 @@ function App() {
           <Route path="/categories" element={<Categories />} />
           <Route path="/countries" element={<Countries />} />
           <Route path="/fundraise-types" element={<FundraiseTypes />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/topics" element={<Topics />} />
+          <Route path="/posts" element={<Posts />} />
           <Route path="/settings" element={<h1>Settings Page</h1>} />
         </Route>
       </Routes>

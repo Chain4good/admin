@@ -96,3 +96,21 @@
   border-color: #2563eb !important;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
 }
+
+/* CKEditor styles */
+.ck-editor__editable {
+  min-height: 300px !important;
+  max-height: 500px !important;
+}
+
+.ck-editor__editable_inline {
+  padding: 0 1rem !important;
+}
+
+.ck.ck-editor__main > .ck-editor__editable {
+  border-radius: 0 0 0.375rem 0.375rem !important;
+}
+
+.ck.ck-toolbar {
+  border-radius: 0.375rem 0.375rem 0 0 !important;
+}

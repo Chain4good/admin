@@ -1,15 +1,20 @@
-import { useState } from "react";
-import { Layout, Menu } from "antd";
 import {
+  AlertOutlined,
+  BookOutlined,
+  DashboardOutlined,
+  FileTextOutlined,
+  FlagOutlined,
+  GlobalOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UserOutlined,
-  DashboardOutlined,
-  SettingOutlined,
+  NotificationOutlined,
+  TagsOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
+import { Layout, Menu } from "antd";
+import { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { theme } from "../styles/theme";
-import { useProfile } from "@/hooks/useAuth";
 
 const { Header, Sider, Content } = Layout;
 
@@ -24,42 +29,47 @@ const AdminLayout = () => {
     },
     {
       key: "campaigns",
-      icon: <UserOutlined />,
+      icon: <FlagOutlined />,
       label: <Link to="/campaigns">Chiến dịch</Link>,
     },
     {
       key: "users",
-      icon: <UserOutlined />,
+      icon: <TeamOutlined />,
       label: <Link to="/users">Nguời dùng</Link>,
     },
     {
       key: "categories",
-      icon: <SettingOutlined />,
+      icon: <TagsOutlined />,
       label: <Link to="/categories">Danh mục</Link>,
     },
     {
       key: "countries",
-      icon: <SettingOutlined />,
+      icon: <GlobalOutlined />,
       label: <Link to="/countries">Quốc gia</Link>,
     },
     {
       key: "fundraiseTypes",
-      icon: <SettingOutlined />,
+      icon: <BookOutlined />,
       label: <Link to="/fundraise-types">Loại chiến dịch</Link>,
     },
     {
       key: "notifications",
-      icon: <SettingOutlined />,
+      icon: <NotificationOutlined />,
       label: <Link to="/notifications">Thông báo</Link>,
     },
     {
       key: "topics",
-      icon: <SettingOutlined />,
+      icon: <TagsOutlined />,
       label: <Link to="/topics">Chủ đề</Link>,
     },
     {
+      key: "posts",
+      icon: <FileTextOutlined />,
+      label: <Link to="/posts">Bài viết</Link>,
+    },
+    {
       key: "reports",
-      icon: <SettingOutlined />,
+      icon: <AlertOutlined />,
       label: <Link to="/reports">Báo cáo</Link>,
     },
   ];

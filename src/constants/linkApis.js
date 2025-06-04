@@ -93,32 +93,19 @@ export const DashboardV1 = {
   GET_DASHBOARD_TOP_CAMPAIGNS: "/dashboard/top-campaigns",
   GET_DASHBOARD_USER_GROWTH: "/dashboard/user-growth",
 };
-// Các API này sẽ cung cấp:
 
-// /dashboard/stats: Thống kê tổng quan
+export const TopicV1 = {
+  GET_TOPICS: "/topics",
+  GET_TOPIC: "/topics",
+  CREATE_TOPIC: "/topics",
+  UPDATE_TOPIC: "/topics",
+  DELETE_TOPIC: "/topics",
+};
 
-// Tổng số user
-// Tổng số campaign
-// Tổng số donation
-// Tổng số tiền quyên góp
-// Số campaign đang hoạt động
-// /dashboard/campaigns-stats: Thống kê về campaigns
-
-// Số lượng campaign theo trạng thái
-// Phân tích trend theo thời gian
-// /dashboard/donations-stats: Thống kê về donations
-
-// Số tiền quyên góp theo thời gian
-// Trend donation
-// /dashboard/recent-activities: Hoạt động gần đây
-
-// Các donation mới nhất
-// Thông tin người donate và campaign
-// /dashboard/top-campaigns: Top campaigns
-
-// Campaigns có số tiền quyên góp cao nhất
-// Số lượng người tham gia
-// /dashboard/user-growth: Thống kê tăng trưởng user
-
-// Số lượng user mới theo thời gian
-// Trend tăng trưởng
+export const PostV1 = {
+  GET_POSTS: "/posts",
+  GET_POST: "/posts",
+  CREATE_POST: "/posts",
+  UPDATE_POST: "/posts",
+  DELETE_POST: "/posts",
+};
