@@ -109,3 +109,12 @@ export const PostV1 = {
   UPDATE_POST: "/posts",
   DELETE_POST: "/posts",
 };
+
+export const ReportV1 = {
+  GET_REPORTS: "/reports",
+  GET_REPORT: "/reports",
+  CREATE_REPORT: "/reports",
+  UPDATE_REPORT: "/reports",
+  DELETE_REPORT: "/reports",
+  GET_REPORT_BY_CAMPAIGN: "/reports/campaign",
+};

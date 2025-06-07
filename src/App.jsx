@@ -13,6 +13,7 @@ import Campaigns from "./pages/Campaigns";
 import Notifications from "./pages/Notifications";
 import Topics from "./pages/Topics";
 import Posts from "./pages/Posts";
+import Reports from "./pages/Reports";
 
 function App() {
   const isAuthenticated = useUserStore((state) => state.isAuthenticated);
@@ -43,6 +44,7 @@ function App() {
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/topics" element={<Topics />} />
           <Route path="/posts" element={<Posts />} />
+          <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<h1>Settings Page</h1>} />
         </Route>
       </Routes>

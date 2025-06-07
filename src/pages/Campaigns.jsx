@@ -2,6 +2,8 @@ import ManageWrapper from "@/components/ManageWrapper";
 import CampaignAnalysis from "@/components/CampaignAnalysis";
 import { CampaignStatus, CampaignStatusColor } from "@/constants/status";
 import { useCampaign } from "@/hooks/useCampaign";
+import { useCategory } from "@/hooks/useCategory";
+import { useFundraiseType } from "@/hooks/useFundraiseType";
 import {
   checkOnChain,
   deleteCampaign,
@@ -10,16 +12,46 @@ import {
   updateCampaignStatus,
   analyzeCampaignTrust,
 } from "@/services/campaignService";
-import { MoreOutlined } from "@ant-design/icons";
-import { Button, Dropdown, message, Modal, Table, Tag } from "antd";
+import { MoreOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Dropdown,
+  Input,
+  message,
+  Modal,
+  Pagination,
+  Select,
+  Table,
+  Tag,
+} from "antd";
 import { truncate } from "lodash";
 import { useState } from "react";
 
 const Campaigns = () => {
-  const { data: campaigns, isFetching, refetch } = useCampaign();
+  const [filters, setFilters] = useState({
+    page: 1,
+    limit: 10,
+    status: undefined,
+    email: undefined,
+    sort: undefined,
+    sortBy: undefined,
+    categoryId: undefined,
+    fundraiseTypeId: undefined,
+    countryId: undefined,
+  });
+  const { data: campaigns, isFetching, refetch } = useCampaign(filters);
+  const { data: categories } = useCategory();
+  const { data: fundraiseTypes } = useFundraiseType();
   const [analysisVisible, setAnalysisVisible] = useState(false);
   const [analysisData, setAnalysisData] = useState(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
+
+  const handleChangeFilter = (name, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleStatusChange = async (id, newStatus) => {
     try {
@@ -273,19 +305,87 @@ const Campaigns = () => {
 
   return (
     <ManageWrapper title="Chiến dịch" subtitle="Quản lý tất cả chiến dịch">
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <Input
+          placeholder="Tìm kiếm theo tiêu đề"
+          allowClear
+          size="large"
+          onChange={(e) => handleChangeFilter("search", e.target.value)}
+        />
+
+        <Select
+          placeholder="Lọc theo trạng thái"
+          allowClear
+          size="large"
+          onChange={(value) => handleChangeFilter("status", value)}
+        >
+          {Object.entries(CampaignStatus).map(([key, value]) => (
+            <Select.Option key={key} value={key}>
+              {value}
+            </Select.Option>
+          ))}
+        </Select>
+
+        <Select
+          placeholder="Lọc theo loại chiến dịch"
+          allowClear
+          size="large"
+          onChange={(value) => handleChangeFilter("fundraiseTypeId", value)}
+        >
+          {fundraiseTypes?.map((type) => (
+            <Select.Option key={type.id} value={type.id}>
+              {type.name}
+            </Select.Option>
+          ))}
+        </Select>
+
+        <Select
+          placeholder="Lọc theo danh mục"
+          allowClear
+          size="large"
+          onChange={(value) => handleChangeFilter("categoryId", value)}
+        >
+          {categories?.data?.map((category) => (
+            <Select.Option key={category.id} value={category.id}>
+              {category.name}
+            </Select.Option>
+          ))}
+        </Select>
+
+        <Select
+          placeholder="Sắp xếp theo"
+          allowClear
+          size="large"
+          onChange={(value) => {
+            const [sort, sortBy] = value.split("-");
+            handleChangeFilter("sort", sort);
+            handleChangeFilter("sortBy", sortBy);
+          }}
+        >
+          <Select.Option value="desc-createdAt">Mới nhất</Select.Option>
+          <Select.Option value="asc-createdAt">Cũ nhất</Select.Option>
+        </Select>
+      </div>
       <Table
         dataSource={campaigns?.data}
         columns={columns}
         loading={isFetching}
         scroll={{ x: 1500 }} // Enable horizontal scrolling
         rowKey="id"
-        pagination={{
-          total: campaigns?.total,
-          pageSize: campaigns?.per_page,
-          current: campaigns?.current_page,
-          showSizeChanger: true,
-          showQuickJumper: true,
+        pagination={false}
+      />
+
+      <Pagination
+        current={filters.page}
+        pageSize={campaigns?.meta?.limit}
+        total={campaigns?.meta?.total}
+        onChange={(page, limit) => {
+          handleChangeFilter("page", page);
+          handleChangeFilter("limit", limit);
         }}
+        align="end"
+        showTotal={(total) => `Tổng ${total} chiến dịch`}
+        style={{ marginTop: "16px" }}
       />
 
       <CampaignAnalysis

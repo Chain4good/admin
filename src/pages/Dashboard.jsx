@@ -80,44 +80,32 @@ const Dashboard = () => {
     data: donationStats || [],
     yField: "amount",
     xField: "donatedAt",
-    smooth: true,
     color: "#059669",
+    xAxis: {
+      label: {
+        autoRotate: true,
+        autoHide: false,
+        autoEllipsis: true,
+      },
+    },
   };
 
   // User growth chart configuration
   const userGrowthConfig = {
-    data: userGrowth || [],
-    xField: "createdAt",
-    yField: "_count",
+    data:
+      userGrowth?.map((item) => ({
+        date: new Date(item.createdAt).toLocaleDateString("vi-VN"),
+        value: item._count,
+      })) || [],
+    xField: "date",
+    yField: "value",
     smooth: true,
     color: "#8B5CF6",
-    xAxis: {
-      type: "time",
-      tickCount: 8,
-      label: {
-        formatter: (value) => {
-          return new Date(value).toLocaleDateString("vi-VN", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          });
-        },
-      },
-    },
-    tooltip: {
-      formatter: (data) => {
-        return {
-          name: "Số người dùng mới",
-          value: data._count,
-          title: new Date(data.createdAt).toLocaleDateString("vi-VN", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          }),
-        };
-      },
-    },
   };
+
+  // Thêm console.log để debug
+  console.log("userGrowth data:", userGrowth);
+  console.log("userGrowthConfig:", userGrowthConfig);
 
   // Top campaigns table columns
   const topCampaignsColumns = [
@@ -237,7 +225,12 @@ const Dashboard = () => {
             title="Thống kê tăng trưởng người dùng"
             loading={isUserGrowthLoading}
           >
-            <Line {...userGrowthConfig} />
+            <Line
+              {...userGrowthConfig}
+              onReady={(plot) => {
+                console.log("Chart ready:", plot);
+              }}
+            />
           </Card>
         </Col>
       </Row>
