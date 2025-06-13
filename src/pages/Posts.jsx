@@ -333,7 +333,11 @@ const Posts = () => {
             />
           </Form.Item>
 
-          <Form.Item name="thumbnail" label="Ảnh bìa">
+          <Form.Item
+            name="thumbnail"
+            className="overflow-hidden"
+            label="Ảnh bìa"
+          >
             <Upload
               listType="picture-card"
               showUploadList={false}
