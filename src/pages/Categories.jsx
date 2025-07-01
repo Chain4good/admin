@@ -165,6 +165,9 @@ const Categories = () => {
     <ManageWrapper
       title="Danh mục"
       subtitle="Quản lý tất cả danh mục"
+      exportData={categories?.data || []}
+      exportColumns={columns}
+      exportFileName="danh_sach_danh_muc"
       extra={
         <Button
           type="primary"

@@ -163,7 +163,13 @@ const Users = () => {
   ];
 
   return (
-    <ManageWrapper title="Danh sách người dùng" subtitle="Quản lý người dùng">
+    <ManageWrapper
+      title="Danh sách người dùng"
+      subtitle="Quản lý người dùng"
+      exportData={users?.data || []}
+      exportColumns={columns}
+      exportFileName="danh_sach_nguoi_dung"
+    >
       <div className="mb-6 flex gap-4">
         <Input
           placeholder="Tìm kiếm theo tên, email, số điện thoại..."

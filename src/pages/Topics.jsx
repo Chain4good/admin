@@ -162,6 +162,9 @@ const Topics = () => {
     <ManageWrapper
       title="Chủ đề"
       subtitle="Quản lý tất cả chủ đề"
+      exportData={topics || []}
+      exportColumns={columns}
+      exportFileName="danh_sach_chu_de"
       extra={
         <Button
           type="primary"

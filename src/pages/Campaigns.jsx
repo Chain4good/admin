@@ -1,5 +1,6 @@
 import ManageWrapper from "@/components/ManageWrapper";
 import CampaignAnalysis from "@/components/CampaignAnalysis";
+import "../styles/table.css";
 import { CampaignStatus, CampaignStatusColor } from "@/constants/status";
 import { useCampaign } from "@/hooks/useCampaign";
 import { useCategory } from "@/hooks/useCategory";
@@ -14,6 +15,7 @@ import {
 } from "@/services/campaignService";
 import { MoreOutlined, PlusOutlined } from "@ant-design/icons";
 import {
+  Avatar,
   Button,
   Dropdown,
   Input,
@@ -23,6 +25,8 @@ import {
   Select,
   Table,
   Tag,
+  Tooltip,
+  Typography,
 } from "antd";
 import { truncate } from "lodash";
 import { useState } from "react";
@@ -200,88 +204,191 @@ const Campaigns = () => {
     },
   ];
 
+  const { Text } = Typography;
+
   const columns = [
     {
       title: "ID",
       dataIndex: "id",
-      width: 60,
+      width: 70,
       fixed: "left",
+      align: "center",
+      render: (id) => (
+        <Text strong style={{ color: "#1890ff" }}>
+          #{id}
+        </Text>
+      ),
     },
     {
       title: "Tiêu đề",
       dataIndex: "title",
-      width: 200,
+      width: 250,
       fixed: "left",
-      render: (title) => <p>{truncate(title, { length: 20 })}</p>,
+      render: (title) => (
+        <Tooltip title={title} placement="topLeft">
+          <Text strong style={{ color: "#262626" }}>
+            {truncate(title, { length: 30 })}
+          </Text>
+        </Tooltip>
+      ),
     },
     {
       title: "Chi tiết",
       dataIndex: "description",
       width: 200,
-      render: (description) => <p>{truncate(description, { length: 20 })}</p>,
+      render: (description) => (
+        <Tooltip title={description} placement="topLeft">
+          <Text type="secondary">{truncate(description, { length: 25 })}</Text>
+        </Tooltip>
+      ),
     },
     {
-      title: "Ngày bắt đầu",
+      title: "Ngày tạo",
       dataIndex: "createdAt",
-      width: 150,
-      render: (createdAt) => <p>{new Date(createdAt).toLocaleString()}</p>,
+      width: 130,
+      render: (createdAt) => (
+        <Text style={{ fontSize: "12px" }}>
+          {new Date(createdAt).toLocaleDateString("vi-VN")}
+        </Text>
+      ),
     },
     {
-      title: "Ngày kết thúc",
+      title: "Hạn chót",
       dataIndex: "deadline",
-      width: 150,
-      render: (deadline) => <p>{new Date(deadline).toLocaleString()}</p>,
+      width: 130,
+      render: (deadline) => {
+        const isExpired = new Date(deadline) < new Date();
+        return (
+          <Text
+            style={{
+              fontSize: "12px",
+              color: isExpired ? "#ff4d4f" : "#52c41a",
+            }}
+          >
+            {new Date(deadline).toLocaleDateString("vi-VN")}
+          </Text>
+        );
+      },
     },
     {
       title: "Trạng thái",
       dataIndex: "status",
       width: 120,
+      align: "center",
       render: (status) => (
-        <Tag color={CampaignStatusColor[status]}>{CampaignStatus[status]}</Tag>
+        <Tag
+          color={CampaignStatusColor[status]}
+          style={{
+            borderRadius: "6px",
+            fontWeight: "500",
+            fontSize: "11px",
+          }}
+        >
+          {CampaignStatus[status]}
+        </Tag>
       ),
     },
     {
       title: "Danh mục",
       dataIndex: ["category", "name"],
-      width: 150,
+      width: 130,
+      render: (name) => (
+        <Tag color="blue" style={{ borderRadius: "4px" }}>
+          {name}
+        </Tag>
+      ),
     },
     {
       title: "Mục tiêu (ETH)",
       dataIndex: "ethGoal",
       width: 120,
+      align: "right",
+      render: (ethGoal) => (
+        <Text strong style={{ color: "#fa8c16" }}>
+          {ethGoal} ETH
+        </Text>
+      ),
     },
     {
       title: "Mục tiêu (VND)",
       dataIndex: "goal",
       width: 150,
-      render: (goal) => <p>{goal.toLocaleString()}</p>,
+      align: "right",
+      render: (goal) => (
+        <Text strong style={{ color: "#52c41a" }}>
+          {goal?.toLocaleString("vi-VN")} ₫
+        </Text>
+      ),
     },
     {
       title: "Người tạo",
       dataIndex: ["user", "name"],
-      width: 150,
+      width: 180,
+      render: (name, record) => (
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <Avatar size="small" style={{ backgroundColor: "#1890ff" }}>
+            {name?.charAt(0)?.toUpperCase()}
+          </Avatar>
+          <Text style={{ fontSize: "13px" }}>{name}</Text>
+        </div>
+      ),
     },
     {
       title: "Hash",
       dataIndex: ["txHash"],
-      width: 200,
-      render: (txHash) => <p>{truncate(txHash, { length: 20 })}</p>,
+      width: 180,
+      render: (txHash) => (
+        <Tooltip title={txHash} placement="topLeft">
+          <Text
+            code
+            // style={{
+            //   fontSize: "11px",
+            //   backgroundColor: "#f5f5f5",
+            //   padding: "2px 6px",
+            //   borderRadius: "4px",
+            // }}
+          >
+            {truncate(txHash, { length: 15 }) || "-"}
+          </Text>
+        </Tooltip>
+      ),
     },
     {
       title: "Hình thức",
       dataIndex: ["fundraiseType", "name"],
-      width: 150,
+      width: 120,
+      render: (name) => (
+        <Tag color="purple" style={{ borderRadius: "4px", fontSize: "11px" }}>
+          {name}
+        </Tag>
+      ),
     },
     {
-      title: "Số quyên góp",
+      title: "Quyên góp",
       dataIndex: ["_count", "donations"],
-      width: 120,
+      width: 100,
+      align: "center",
+      render: (count) => (
+        <div
+          style={{
+            backgroundColor: "#f0f0f0",
+            borderRadius: "12px",
+            padding: "4px 8px",
+            display: "inline-block",
+          }}
+        >
+          <Text strong style={{ color: "#1890ff", fontSize: "12px" }}>
+            {count || 0}
+          </Text>
+        </div>
+      ),
     },
     {
       title: "Hành động",
       key: "action",
       fixed: "right",
       width: 80,
+      align: "center",
       render: (_, record) => (
         <Dropdown
           menu={{ items: getItems(record) }}
@@ -291,11 +398,12 @@ const Campaigns = () => {
           <Button
             type="text"
             icon={<MoreOutlined />}
-            className="border-none shadow-none"
+            className="border-none shadow-none hover:bg-gray-100"
             style={{
-              fontSize: "20px",
+              fontSize: "18px",
               color: "#666",
               padding: "4px 8px",
+              borderRadius: "6px",
             }}
           />
         </Dropdown>
@@ -304,76 +412,106 @@ const Campaigns = () => {
   ];
 
   return (
-    <ManageWrapper title="Chiến dịch" subtitle="Quản lý tất cả chiến dịch">
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <Input
-          placeholder="Tìm kiếm theo tiêu đề"
-          allowClear
-          size="large"
-          onChange={(e) => handleChangeFilter("search", e.target.value)}
-        />
+    <ManageWrapper
+      title="Chiến dịch"
+      subtitle="Quản lý tất cả chiến dịch"
+      exportData={campaigns?.data || []}
+      exportColumns={columns}
+      exportFileName="danh_sach_chien_dich"
+    >
+      <div className="filter-section">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <Input
+            placeholder="🔍 Tìm kiếm theo tiêu đề..."
+            allowClear
+            size="large"
+            onChange={(e) => handleChangeFilter("search", e.target.value)}
+            // style={{ borderRadius: "8px" }}
+          />
 
-        <Select
-          placeholder="Lọc theo trạng thái"
-          allowClear
-          size="large"
-          onChange={(value) => handleChangeFilter("status", value)}
-        >
-          {Object.entries(CampaignStatus).map(([key, value]) => (
-            <Select.Option key={key} value={key}>
-              {value}
-            </Select.Option>
-          ))}
-        </Select>
+          <Select
+            placeholder="📊 Lọc theo trạng thái"
+            allowClear
+            size="large"
+            onChange={(value) => handleChangeFilter("status", value)}
+            style={{ borderRadius: "8px" }}
+          >
+            {Object.entries(CampaignStatus).map(([key, value]) => (
+              <Select.Option key={key} value={key}>
+                <Tag
+                  color={CampaignStatusColor[key]}
+                  style={{ marginRight: 8 }}
+                >
+                  {value}
+                </Tag>
+              </Select.Option>
+            ))}
+          </Select>
 
-        <Select
-          placeholder="Lọc theo loại chiến dịch"
-          allowClear
-          size="large"
-          onChange={(value) => handleChangeFilter("fundraiseTypeId", value)}
-        >
-          {fundraiseTypes?.map((type) => (
-            <Select.Option key={type.id} value={type.id}>
-              {type.name}
-            </Select.Option>
-          ))}
-        </Select>
+          <Select
+            placeholder="🎯 Lọc theo loại chiến dịch"
+            allowClear
+            size="large"
+            onChange={(value) => handleChangeFilter("fundraiseTypeId", value)}
+            style={{ borderRadius: "8px" }}
+          >
+            {fundraiseTypes?.map((type) => (
+              <Select.Option key={type.id} value={type.id}>
+                {type.name}
+              </Select.Option>
+            ))}
+          </Select>
 
-        <Select
-          placeholder="Lọc theo danh mục"
-          allowClear
-          size="large"
-          onChange={(value) => handleChangeFilter("categoryId", value)}
-        >
-          {categories?.data?.map((category) => (
-            <Select.Option key={category.id} value={category.id}>
-              {category.name}
-            </Select.Option>
-          ))}
-        </Select>
+          <Select
+            placeholder="📁 Lọc theo danh mục"
+            allowClear
+            size="large"
+            onChange={(value) => handleChangeFilter("categoryId", value)}
+            style={{ borderRadius: "8px" }}
+          >
+            {categories?.data?.map((category) => (
+              <Select.Option key={category.id} value={category.id}>
+                {category.name}
+              </Select.Option>
+            ))}
+          </Select>
 
-        <Select
-          placeholder="Sắp xếp theo"
-          allowClear
-          size="large"
-          onChange={(value) => {
-            const [sort, sortBy] = value.split("-");
-            handleChangeFilter("sort", sort);
-            handleChangeFilter("sortBy", sortBy);
-          }}
-        >
-          <Select.Option value="desc-createdAt">Mới nhất</Select.Option>
-          <Select.Option value="asc-createdAt">Cũ nhất</Select.Option>
-        </Select>
+          <Select
+            placeholder="🔄 Sắp xếp theo"
+            allowClear
+            size="large"
+            onChange={(value) => {
+              const [sort, sortBy] = value.split("-");
+              handleChangeFilter("sort", sort);
+              handleChangeFilter("sortBy", sortBy);
+            }}
+            style={{ borderRadius: "8px" }}
+          >
+            <Select.Option value="desc-createdAt">📅 Mới nhất</Select.Option>
+            <Select.Option value="asc-createdAt">📅 Cũ nhất</Select.Option>
+          </Select>
+        </div>
       </div>
-      <Table
-        dataSource={campaigns?.data}
-        columns={columns}
-        loading={isFetching}
-        scroll={{ x: 1500 }} // Enable horizontal scrolling
-        rowKey="id"
-        pagination={false}
-      />
+      <div className="table-container">
+        <Table
+          dataSource={campaigns?.data}
+          columns={columns}
+          loading={isFetching}
+          scroll={{ x: 1600 }}
+          rowKey="id"
+          pagination={false}
+          size="middle"
+          className="custom-table"
+          style={{
+            backgroundColor: "#fff",
+            borderRadius: "8px",
+            overflow: "hidden",
+          }}
+          rowClassName={(_, index) =>
+            index % 2 === 0 ? "table-row-light" : "table-row-dark"
+          }
+        />
+      </div>
 
       <Pagination
         current={filters.page}

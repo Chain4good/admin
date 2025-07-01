@@ -123,6 +123,9 @@ const Countries = () => {
     <ManageWrapper
       title="Quốc gia"
       subtitle="Quản lý tất cả quốc gia"
+      exportData={countries || []}
+      exportColumns={columns}
+      exportFileName="danh_sach_quoc_gia"
       extra={
         <Button
           type="primary"
