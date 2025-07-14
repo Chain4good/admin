@@ -1045,3 +1045,208 @@
 .post-loading .ant-skeleton-paragraph {
   margin-bottom: 0 !important;
 }
+
+/* Verification Modal Styles */
+.verification-modal .ant-modal-header {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border-radius: 12px 12px 0 0;
+  border-bottom: none;
+}
+
+.verification-modal .ant-modal-header .ant-modal-title {
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.verification-modal .ant-modal-body {
+  padding: 24px;
+}
+
+.verification-modal .ant-modal-footer {
+  border-top: 1px solid #f1f5f9;
+  padding: 16px 24px;
+  border-radius: 0 0 12px 12px;
+}
+
+/* Campaign info section in verification modal */
+.campaign-info-section {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.campaign-info-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #f97316 0%, #ea580c 100%);
+  border-radius: 12px 12px 0 0;
+}
+
+/* Verification request button */
+.verification-request-btn {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.verification-request-btn:hover {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+  transform: translateY(-2px);
+}
+
+.verification-request-btn:active {
+  transform: translateY(0);
+}
+
+/* Status tags enhancements */
+.ant-tag.need-verification-tag {
+  background: linear-gradient(135deg, #fed7aa 0%, #fb923c 100%);
+  color: #9a3412;
+  border: none;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
+}
+
+/* Table row highlighting for pending campaigns */
+.ant-table-tbody > tr.pending-campaign {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-left: 4px solid #f59e0b;
+}
+
+.ant-table-tbody > tr.need-verification-campaign {
+  background: linear-gradient(135deg, #fed7aa 0%, #fde047 100%);
+  border-left: 4px solid #f97316;
+}
+
+/* Verification message tooltip */
+.verification-message-tooltip {
+  max-width: 300px;
+  background: #1f2937;
+  color: white;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.verification-message-tooltip .ant-tooltip-arrow {
+  color: #1f2937;
+}
+
+/* Action buttons in table */
+.campaign-action-buttons .ant-btn {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.campaign-action-buttons .ant-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Quick action buttons for pending campaigns */
+.quick-approve-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s ease;
+}
+
+.quick-approve-btn:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  transform: translateY(-1px);
+}
+
+.quick-reject-btn {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border: none;
+  color: white;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+  transition: all 0.3s ease;
+}
+
+.quick-reject-btn:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Enhanced TextArea for verification message */
+.verification-textarea .ant-input {
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+  font-family: "Inter", sans-serif;
+  line-height: 1.6;
+}
+
+.verification-textarea .ant-input:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.verification-textarea .ant-input:hover {
+  border-color: #fb923c;
+}
+
+/* Character count styling */
+.verification-textarea .ant-input-data-count {
+  color: #6b7280;
+  font-size: 12px;
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* Dashboard stats card for verification requests */
+.verification-stats-card {
+  background: linear-gradient(135deg, #fed7aa 0%, #fb923c 100%);
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(249, 115, 22, 0.15);
+  transition: all 0.3s ease;
+}
+
+.verification-stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(249, 115, 22, 0.2);
+}
+
+.verification-stats-card .ant-statistic-title {
+  color: #9a3412;
+  font-weight: 600;
+}
+
+.verification-stats-card .ant-statistic-content-value {
+  color: #7c2d12;
+}
+
+/* Responsive design for verification features */
+@media (max-width: 768px) {
+  .verification-request-btn {
+    font-size: 10px;
+    height: 20px;
+    padding: 0 6px;
+  }
+
+  .campaign-action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .verification-modal .ant-modal-body {
+    padding: 16px;
+  }
+}

@@ -16,6 +16,9 @@ import {
   Modal,
   Typography,
   Image,
+  Form,
+  Tooltip,
+  message,
 } from "antd";
 import {
   UserOutlined,
@@ -43,13 +46,16 @@ import {
   CommentOutlined,
   ShareAltOutlined,
   BookOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 
 const { Text, Title, Paragraph } = Typography;
+const { TextArea } = Input;
 import { useDashboard } from "@/hooks/useDashboard";
 import { Line, Column } from "@ant-design/charts";
 import React, { useState, useMemo } from "react";
 import { CampaignStatus } from "@/constants/status";
+import { requestAdditionalVerification } from "@/services/campaignService";
 import "@/styles/dashboard.css";
 
 const Dashboard = () => {
@@ -60,6 +66,12 @@ const Dashboard = () => {
   // Post preview state
   const [selectedPost, setSelectedPost] = useState(null);
   const [isPreviewVisible, setIsPreviewVisible] = useState(false);
+
+  // Additional verification modal state
+  const [verificationVisible, setVerificationVisible] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState(null);
+  const [verificationForm] = Form.useForm();
+
   const { data: statsData, isLoading: isStatsLoading } = useDashboard("stats");
 
   const { data: campaignStats, isLoading: isCampaignStatsLoading } =
@@ -165,6 +177,25 @@ const Dashboard = () => {
     console.log("Navigating to:", value);
     // You can add navigation logic here
     // For example: window.location.href = `/${value}`;
+  };
+
+  const handleRequestVerification = (campaign) => {
+    setSelectedCampaign(campaign);
+    setVerificationVisible(true);
+    verificationForm.resetFields();
+  };
+
+  const handleVerificationSubmit = async (values) => {
+    try {
+      await requestAdditionalVerification(selectedCampaign.id, values.message);
+      message.success("Đã gửi yêu cầu xác minh bổ sung!");
+      setVerificationVisible(false);
+      verificationForm.resetFields();
+      setSelectedCampaign(null);
+      // You may want to refetch dashboard data here
+    } catch (error) {
+      message.error("Gửi yêu cầu thất bại!");
+    }
   };
 
   // User info - you can replace this with actual user data from context/store
@@ -529,6 +560,68 @@ const Dashboard = () => {
         <Tag color="blue" className="px-3 py-1 rounded-full">
           {value} người
         </Tag>
+      ),
+    },
+    {
+      title: (
+        <span className="flex items-center gap-2">
+          <SettingOutlined className="text-gray-500" />
+          Trạng thái
+        </span>
+      ),
+      dataIndex: "status",
+      key: "status",
+      render: (status) => {
+        const statusColors = {
+          PENDING: "#F59E0B",
+          NEED_VERIFICATION: "#F97316",
+          APPROVED: "#10B981",
+          REJECTED: "#EF4444",
+          ACTIVE: "#3B82F6",
+          FINISHED: "#8B5CF6",
+        };
+        return (
+          <Tag color={statusColors[status]} className="px-3 py-1 rounded-full">
+            {CampaignStatus[status]}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: (
+        <span className="flex items-center gap-2">
+          <ExclamationCircleOutlined className="text-orange-500" />
+          Hành động
+        </span>
+      ),
+      key: "action",
+      render: (_, record) => (
+        <Space>
+          {record.status === "PENDING" && (
+            <Tooltip title="Yêu cầu xác minh bổ sung">
+              <Button
+                type="primary"
+                size="small"
+                icon={<ExclamationCircleOutlined />}
+                onClick={() => handleRequestVerification(record)}
+                style={{
+                  background: "#F97316",
+                  borderColor: "#F97316",
+                  fontSize: "12px",
+                  height: "28px",
+                  padding: "0 12px",
+                }}
+              >
+                Yêu cầu xác minh
+              </Button>
+            </Tooltip>
+          )}
+          {record.status === "NEED_VERIFICATION" && (
+            <Tag color="orange" className="px-2 py-1 text-xs">
+              Đang chờ xác minh
+            </Tag>
+          )}
+        </Space>
       ),
     },
   ];
@@ -971,27 +1064,90 @@ const Dashboard = () => {
           </Col>
         </Row>
 
+        {/* Additional Verification Modal */}
+        <Modal
+          title={
+            <Space>
+              <ExclamationCircleOutlined style={{ color: "#F97316" }} />
+              <span>Yêu cầu xác minh bổ sung</span>
+            </Space>
+          }
+          open={verificationVisible}
+          onCancel={() => {
+            setVerificationVisible(false);
+            setSelectedCampaign(null);
+            verificationForm.resetFields();
+          }}
+          footer={null}
+          width={600}
+        >
+          {selectedCampaign && (
+            <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+              <Typography.Text strong>Chiến dịch: </Typography.Text>
+              <Typography.Text>{selectedCampaign.title}</Typography.Text>
+              <br />
+              <Typography.Text strong>Người tạo: </Typography.Text>
+              <Typography.Text>
+                {selectedCampaign.user?.email || "N/A"}
+              </Typography.Text>
+            </div>
+          )}
+
+          <Form
+            form={verificationForm}
+            layout="vertical"
+            onFinish={handleVerificationSubmit}
+          >
+            <Form.Item
+              name="message"
+              label="Tin nhắn yêu cầu xác minh"
+              rules={[
+                { required: true, message: "Vui lòng nhập tin nhắn!" },
+                { min: 10, message: "Tin nhắn phải có ít nhất 10 ký tự!" },
+              ]}
+            >
+              <TextArea
+                rows={6}
+                placeholder="Nhập tin nhắn chi tiết về những thông tin cần được xác minh hoặc bổ sung thêm cho chiến dịch này..."
+                showCount
+                maxLength={500}
+              />
+            </Form.Item>
+
+            <Form.Item className="mb-0 text-right">
+              <Space>
+                <Button
+                  onClick={() => {
+                    setVerificationVisible(false);
+                    setSelectedCampaign(null);
+                    verificationForm.resetFields();
+                  }}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  style={{ background: "#F97316", borderColor: "#F97316" }}
+                >
+                  Gửi yêu cầu
+                </Button>
+              </Space>
+            </Form.Item>
+          </Form>
+        </Modal>
+
         {/* Post Preview Modal */}
         <Modal
           title={
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
-                <BookOutlined className="text-white" />
-              </div>
-              <div>
-                <div className="font-bold text-lg">{selectedPost?.title}</div>
-                <div className="text-sm text-gray-500 font-normal">
-                  {selectedPost?.author} • {selectedPost?.readTime}
-                </div>
-              </div>
-            </div>
+            <span className="flex items-center gap-2">
+              <EyeOutlined className="text-blue-500" />
+              Xem trước bài viết
+            </span>
           }
           open={isPreviewVisible}
           onCancel={handleClosePreview}
           footer={[
-            <Button key="edit" type="primary" icon={<EditOutlined />}>
-              Chỉnh sửa
-            </Button>,
             <Button key="close" onClick={handleClosePreview}>
               Đóng
             </Button>,
@@ -1005,48 +1161,40 @@ const Dashboard = () => {
                 <Image
                   src={selectedPost.image}
                   alt={selectedPost.title}
-                  className="w-full h-64 object-cover rounded-lg"
+                  width="100%"
+                  style={{
+                    borderRadius: "12px",
+                    maxHeight: "300px",
+                    objectFit: "cover",
+                  }}
                 />
               </div>
-              <div className="flex items-center gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
-                <Tag color="blue" className="px-3 py-1 rounded-full">
+
+              <div className="mb-4">
+                <Tag color="blue" className="mb-2">
                   {selectedPost.category}
                 </Tag>
-                <span className="text-gray-600">
-                  <CalendarOutlined className="mr-1" />
-                  {new Date(selectedPost.publishDate).toLocaleDateString(
-                    "vi-VN"
-                  )}
-                </span>
-                <span className="text-gray-600">{selectedPost.readTime}</span>
+                <Title level={3} className="mb-2">
+                  {selectedPost.title}
+                </Title>
               </div>
-              <div
-                className="prose max-w-none"
-                dangerouslySetInnerHTML={{ __html: selectedPost.content }}
-              />
-              <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+
+              <div className="flex items-center gap-4 mb-4 pb-4 border-b border-gray-200">
                 <div className="flex items-center gap-2">
-                  <Avatar icon={<UserOutlined />} />
-                  <div>
-                    <div className="font-medium">{selectedPost.author}</div>
-                    <div className="text-sm text-gray-500">Tác giả</div>
-                  </div>
+                  <Avatar size="small" icon={<UserOutlined />} />
+                  <Text>Admin</Text>
                 </div>
-                <div className="flex items-center gap-6 text-gray-600">
-                  <span className="flex items-center gap-1">
-                    <HeartOutlined />
-                    {selectedPost.likes}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <CommentOutlined />
-                    {selectedPost.comments}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <ShareAltOutlined />
-                    {selectedPost.shares}
-                  </span>
+                <div className="flex items-center gap-1 text-gray-500">
+                  <CalendarOutlined />
+                  <Text>
+                    {new Date(selectedPost.publishDate).toLocaleDateString(
+                      "vi-VN"
+                    )}
+                  </Text>
                 </div>
               </div>
+
+              <Paragraph>{selectedPost.excerpt}</Paragraph>
             </div>
           )}
         </Modal>

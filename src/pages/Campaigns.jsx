@@ -12,8 +12,15 @@ import {
   summarizeByAI,
   updateCampaignStatus,
   analyzeCampaignTrust,
+  requestAdditionalVerification,
 } from "@/services/campaignService";
-import { MoreOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  MoreOutlined,
+  PlusOutlined,
+  ExclamationCircleOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+} from "@ant-design/icons";
 import {
   Avatar,
   Button,
@@ -27,9 +34,13 @@ import {
   Tag,
   Tooltip,
   Typography,
+  Form,
+  Space,
 } from "antd";
 import { truncate } from "lodash";
 import { useState } from "react";
+
+const { TextArea } = Input;
 
 const Campaigns = () => {
   const [filters, setFilters] = useState({
@@ -50,6 +61,11 @@ const Campaigns = () => {
   const [analysisData, setAnalysisData] = useState(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
 
+  // Additional verification modal state
+  const [verificationVisible, setVerificationVisible] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState(null);
+  const [verificationForm] = Form.useForm();
+
   const handleChangeFilter = (name, value) => {
     setFilters((prev) => ({
       ...prev,
@@ -62,8 +78,31 @@ const Campaigns = () => {
       await updateCampaignStatus(id, newStatus);
       message.success("Cập nhật trạng thái thành công!");
       refetch();
-    } catch (error) {
+    } catch {
       message.error("Cập nhật trạng thái thất bại!");
+    }
+  };
+
+  const handleRequestVerification = (campaign) => {
+    setSelectedCampaign(campaign);
+    setVerificationVisible(true);
+    verificationForm.resetFields();
+  };
+
+  const handleVerificationSubmit = async (values) => {
+    try {
+      await requestAdditionalVerification(
+        selectedCampaign.id,
+        values.message,
+        values.reason
+      );
+      message.success("Đã gửi yêu cầu xác minh bổ sung!");
+      setVerificationVisible(false);
+      verificationForm.resetFields();
+      setSelectedCampaign(null);
+      refetch();
+    } catch {
+      message.error("Gửi yêu cầu thất bại!");
     }
   };
 
@@ -79,7 +118,7 @@ const Campaigns = () => {
           await deleteCampaign(id);
           message.success("Xóa chiến dịch thành công!");
           refetch();
-        } catch (error) {
+        } catch {
           message.error("Xóa chiến dịch thất bại!");
         }
       },
@@ -99,7 +138,7 @@ const Campaigns = () => {
           </div>
         ),
       });
-    } catch (error) {
+    } catch {
       message.error("Kiểm tra on-chain thất bại!");
     }
   };
@@ -112,7 +151,7 @@ const Campaigns = () => {
         width: 600,
         content: summary,
       });
-    } catch (error) {
+    } catch {
       message.error("Không thể tạo tóm tắt!");
     }
   };
@@ -121,7 +160,7 @@ const Campaigns = () => {
     try {
       await sendEmailToOwner(id, userEmail);
       message.success("Gửi email thành công!");
-    } catch (error) {
+    } catch {
       message.error("Gửi email thất bại!");
     }
   };
@@ -132,7 +171,7 @@ const Campaigns = () => {
       setAnalysisLoading(true);
       const data = await analyzeCampaignTrust(id);
       setAnalysisData(data);
-    } catch (error) {
+    } catch {
       message.error("Không thể phân tích chiến dịch!");
     } finally {
       setAnalysisLoading(false);
@@ -144,6 +183,11 @@ const Campaigns = () => {
       key: "PENDING",
       label: "Chờ duyệt",
       disabled: record.status === "PENDING",
+    },
+    {
+      key: "NEED_VERIFICATION",
+      label: "Cần xác minh bổ sung",
+      disabled: record.status === "NEED_VERIFICATION",
     },
     {
       key: "APPROVED",
@@ -198,7 +242,7 @@ const Campaigns = () => {
     },
     {
       key: "delete",
-      label: "Xóa chiến dịch",
+      label: "Xóa",
       danger: true,
       onClick: () => handleDelete(record.id),
     },
@@ -275,17 +319,45 @@ const Campaigns = () => {
       dataIndex: "status",
       width: 120,
       align: "center",
-      render: (status) => (
-        <Tag
-          color={CampaignStatusColor[status]}
-          style={{
-            borderRadius: "6px",
-            fontWeight: "500",
-            fontSize: "11px",
-          }}
-        >
-          {CampaignStatus[status]}
-        </Tag>
+      render: (status, record) => (
+        <Space direction="vertical" size="small">
+          <Tag
+            color={CampaignStatusColor[status]}
+            style={{
+              borderRadius: "6px",
+              fontWeight: "500",
+              fontSize: "11px",
+            }}
+          >
+            {CampaignStatus[status]}
+          </Tag>
+          {status === "PENDING" && (
+            <Button
+              type="primary"
+              size="small"
+              icon={<ExclamationCircleOutlined />}
+              onClick={() => handleRequestVerification(record)}
+              className="verification-request-btn"
+              style={{
+                background: "linear-gradient(135deg, #F97316 0%, #EA580C 100%)",
+                border: "none",
+                fontSize: "11px",
+                fontWeight: "500",
+                borderRadius: "6px",
+                boxShadow: "0 2px 4px rgba(249, 115, 22, 0.2)",
+              }}
+            >
+              Yêu cầu xác minh bổ sung
+            </Button>
+          )}
+          {status === "NEED_VERIFICATION" && record.verificationMessage && (
+            <Tooltip title={record.verificationMessage}>
+              <Text type="secondary" style={{ fontSize: "11px" }}>
+                {truncate(record.verificationMessage, { length: 30 })}
+              </Text>
+            </Tooltip>
+          )}
+        </Space>
       ),
     },
     {
@@ -324,7 +396,7 @@ const Campaigns = () => {
       title: "Người tạo",
       dataIndex: ["user", "name"],
       width: 180,
-      render: (name, record) => (
+      render: (name) => (
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <Avatar size="small" style={{ backgroundColor: "#1890ff" }}>
             {name?.charAt(0)?.toUpperCase()}
@@ -390,23 +462,47 @@ const Campaigns = () => {
       width: 80,
       align: "center",
       render: (_, record) => (
-        <Dropdown
-          menu={{ items: getItems(record) }}
-          trigger={["click"]}
-          placement="bottomRight"
-        >
-          <Button
-            type="text"
-            icon={<MoreOutlined />}
-            className="border-none shadow-none hover:bg-gray-100"
-            style={{
-              fontSize: "18px",
-              color: "#666",
-              padding: "4px 8px",
-              borderRadius: "6px",
-            }}
-          />
-        </Dropdown>
+        <Space>
+          {record.status === "PENDING" && (
+            <>
+              <Tooltip title="Duyệt">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<CheckCircleOutlined />}
+                  onClick={() => handleStatusChange(record.id, "APPROVED")}
+                  style={{ color: "#10B981" }}
+                />
+              </Tooltip>
+              <Tooltip title="Từ chối">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<CloseCircleOutlined />}
+                  onClick={() => handleStatusChange(record.id, "REJECTED")}
+                  style={{ color: "#EF4444" }}
+                />
+              </Tooltip>
+            </>
+          )}
+          <Dropdown
+            menu={{ items: getItems(record) }}
+            trigger={["click"]}
+            placement="bottomRight"
+          >
+            <Button
+              type="text"
+              icon={<MoreOutlined />}
+              className="border-none shadow-none hover:bg-gray-100"
+              style={{
+                fontSize: "18px",
+                color: "#666",
+                padding: "4px 8px",
+                borderRadius: "6px",
+              }}
+            />
+          </Dropdown>
+        </Space>
       ),
     },
   ];
@@ -526,6 +622,107 @@ const Campaigns = () => {
         style={{ marginTop: "16px" }}
       />
 
+      {/* Additional Verification Modal */}
+      <Modal
+        title={
+          <Space>
+            <ExclamationCircleOutlined style={{ color: "#F97316" }} />
+            <span>Yêu cầu xác minh bổ sung</span>
+          </Space>
+        }
+        open={verificationVisible}
+        onCancel={() => {
+          setVerificationVisible(false);
+          setSelectedCampaign(null);
+          verificationForm.resetFields();
+        }}
+        footer={null}
+        width={600}
+        className="verification-modal"
+      >
+        {selectedCampaign && (
+          <div className="campaign-info-section">
+            <Typography.Text strong>Chiến dịch: </Typography.Text>
+            <Typography.Text>{selectedCampaign.title}</Typography.Text>
+            <br />
+            <Typography.Text strong>Người tạo: </Typography.Text>
+            <Typography.Text>{selectedCampaign.user?.email}</Typography.Text>
+          </div>
+        )}
+
+        <Form
+          form={verificationForm}
+          layout="vertical"
+          onFinish={handleVerificationSubmit}
+        >
+          <Form.Item name="reason" label="Lý do yêu cầu xác minh (tùy chọn)">
+            <Select
+              placeholder="Chọn lý do yêu cầu xác minh..."
+              allowClear
+              options={[
+                {
+                  value: "DOCUMENT_VERIFICATION",
+                  label: "🗂️ Xác minh tài liệu",
+                },
+                {
+                  value: "IDENTITY_VERIFICATION",
+                  label: "👤 Xác minh danh tính",
+                },
+                {
+                  value: "FINANCIAL_VERIFICATION",
+                  label: "💰 Xác minh tài chính",
+                },
+                {
+                  value: "BUSINESS_VERIFICATION",
+                  label: "🏢 Xác minh doanh nghiệp",
+                },
+                { value: "PROJECT_DETAILS", label: "📋 Chi tiết dự án" },
+                { value: "COMPLIANCE_CHECK", label: "✅ Kiểm tra tuân thủ" },
+                { value: "OTHER", label: "🔍 Khác" },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="message"
+            label="Tin nhắn yêu cầu xác minh"
+            rules={[
+              { required: true, message: "Vui lòng nhập tin nhắn!" },
+              { min: 10, message: "Tin nhắn phải có ít nhất 10 ký tự!" },
+            ]}
+          >
+            <TextArea
+              rows={6}
+              placeholder="Nhập tin nhắn chi tiết về những thông tin cần được xác minh hoặc bổ sung thêm cho chiến dịch này..."
+              showCount
+              maxLength={500}
+            />
+          </Form.Item>
+
+          <Form.Item className="mb-0 text-right">
+            <Space>
+              <Button
+                onClick={() => {
+                  setVerificationVisible(false);
+                  setSelectedCampaign(null);
+                  verificationForm.resetFields();
+                }}
+              >
+                Hủy
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ background: "#F97316", borderColor: "#F97316" }}
+              >
+                Gửi yêu cầu
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Campaign Analysis Modal */}
       <CampaignAnalysis
         visible={analysisVisible}
         loading={analysisLoading}

@@ -113,3 +113,73 @@
   border-color: #667eea !important;
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1) !important;
 }
+
+/* Verification Request Button Styles */
+.verification-request-btn {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  padding: 4px 8px !important;
+  height: auto !important;
+  line-height: 1.2 !important;
+  box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2) !important;
+  transition: all 0.2s ease !important;
+}
+
+.verification-request-btn:hover {
+  background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(249, 115, 22, 0.3) !important;
+}
+
+.verification-request-btn:active {
+  transform: translateY(0) !important;
+}
+
+/* Verification Modal Styles */
+.verification-modal .ant-modal-header {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 20px 24px 16px;
+}
+
+.verification-modal .ant-modal-body {
+  padding: 20px 24px;
+}
+
+.verification-modal .campaign-info-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.verification-modal .campaign-info-section .ant-typography {
+  margin-bottom: 4px !important;
+}
+
+.verification-modal .ant-form-item-label > label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.verification-modal .ant-input {
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  transition: all 0.2s ease;
+}
+
+.verification-modal .ant-input:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1);
+}
+
+/* Status tag improvements for NEED_VERIFICATION */
+.ant-tag[style*="#F97316"] {
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%) !important;
+  border: 1px solid #f97316 !important;
+  color: #9a3412 !important;
+  font-weight: 600 !important;
+}

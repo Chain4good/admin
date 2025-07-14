@@ -43,6 +43,11 @@ export const CampaignV1 = {
   DELETE_CAMPAIGN: "/campaigns",
   GET_MY_CAMPAIGNS: "/campaigns/my-campaigns",
   GET_CALCULATE_ETH_GOAL: "/campaigns/calculate-eth-goal",
+  CHECK_ONCHAIN: "/campaigns/check-onchain",
+  AI_SUMMARY: "/campaigns/ai-summary",
+  SEND_EMAIL: "/campaigns/send-email",
+  REQUEST_VERIFICATION: "/campaigns",
+  // ADD_EVIDENCE: "",
 };
 
 export const DonationV1 = {

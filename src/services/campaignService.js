@@ -118,3 +118,18 @@ export const analyzeCampaignTrust = async (id) => {
   const { data } = await requestInstance.get(url);
   return data;
 };
+
+export const requestAdditionalVerification = async (
+  id,
+  message,
+  reason = null
+) => {
+  const url = queryString.stringifyUrl({
+    url: `${CampaignV1.REQUEST_VERIFICATION}/${id}/request-verification`,
+  });
+  const { data } = await requestInstance.post(url, {
+    message,
+    reason,
+  });
+  return data;
+};
